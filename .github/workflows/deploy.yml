@@ -1,0 +1,39 @@
+name: NuGet pack and push
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./Sut.Generator
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Extract version
+      id: version
+      run: |
+        version=$(echo "${{ github.ref_name }}" | cut -d "-" -f 1)
+        echo "number=${version}" >> $GITHUB_OUTPUT
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release /p:Version=${{ steps.version.outputs.number }}
+
+    - name: Pack
+      run: dotnet pack --no-build --configuration Release /p:Version=${{ github.ref_name }} --output ./out
+
+    - name: Push to nuget.org
+      run: dotnet nuget push ./out/Sut.Generator.${{ github.ref_name }}.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source ${{ vars.NUGET_SOURCE }}
