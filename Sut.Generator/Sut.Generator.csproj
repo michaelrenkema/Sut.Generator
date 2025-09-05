@@ -10,8 +10,25 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>Sut.Generator</PackageId>
+    <PackageDescription>
+      Sut Generator
+
+      This is an incremental generator for C# .NET intended to simplify setup of mocks when writing unit tests.
+      It will automatically generate much of the boilerplate code required when setting up mocks using the Moq library.
+      The builder pattern is used to allow selection of dependencies and methods to be mocked, and to reduce code duplication across unit tests.
+    </PackageDescription>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
     <Authors>Michael Renkema</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/michaelrenkema/Sut.Generator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\" />
+    <None Include="../LICENSE.txt" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="*">
