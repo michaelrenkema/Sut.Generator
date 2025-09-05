@@ -59,30 +59,28 @@ Adding the [Sut<Class>] attribute to a unit test class, where the class name is 
       }
     }
 
-## Deployment
+## Contributing
 
-The incremental generator is deployed to nuget.org using GitHub Actions. To build and deploy to nuget.org, tag a commit with a semantic version. The tag may include a prerelease suffix.
+Contributions are welcome.
 
-Variables:
-NUGET_SOURCE: https://api.nuget.org/v3/index.json
+### Deployment
 
-Secrets:
-NUGET_API_KEY: {api-key}
+The incremental generator is deployed to nuget.org using GitHub Actions. Tagging a commit with a semantic version will trigger build and deployment. The tag may include a prerelease suffix.
 
-## Local debugging
+### Local debugging
 
 The Sut.Generator.Tests project can be used to debug the incremental generator. There are numerous unit tests setup that use the Verify library to output and compare generated code, and to provide an entry point for debugging. Simply set a breakpoint in the Sut.Generator project code then debug a unit test in the Sut.Generator.Tests project.
 
-## Local testing
+### Local testing
 
 Once local debugging is complete, the following process can be executed to build and install a local NuGet package into the Sut.Generator.Example.Tests project. The unit tests in this project will test the incremental generator output in a scenario similar to that used by consumers of the NuGet package.
 
-cd ./Sut.Generator<br/>
-dotnet build --no-incremental<br/>
-dotnet pack --no-build --configuration Debug /p:Version=0.0.0-pre --output ./out<br/>
-rm -rf ~/.nuget/packages/sut.generator<br/>
-dotnet nuget push ./out/Sut.Generator.0.0.0-pre.nupkg --source ~/.nuget/packages<br/>
-cd ../Sut.Generator.Example.Tests<br/>
-dotnet add package Sut.Generator --prerelease --source ~/.nuget/packages<br/>
-dotnet build --no-incremental<br/>
-dotnet test<br/>
+    cd ./Sut.Generator
+    dotnet build --no-incremental
+    dotnet pack --no-build --configuration Debug /p:Version=0.0.0-pre --output ./out
+    rm -rf ~/.nuget/packages/sut.generator
+    dotnet nuget push ./out/Sut.Generator.0.0.0-pre.nupkg --source ~/.nuget/packages
+    cd ../Sut.Generator.Example.Tests
+    dotnet add package Sut.Generator --prerelease --source ~/.nuget/packages
+    dotnet build --no-incremental
+    dotnet test
