@@ -254,19 +254,26 @@ public class SutAttribute<T>() : System.Attribute {}
           foreach (var parameter in methodSymbol.Parameters)
             {
               var parameterTypeArguments = new EquatableList<SutTypeArgument>();
-              if (parameter.Type is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.Arity > 0)
+              if (parameter.Type is IArrayTypeSymbol arrayTypeSymbol)
               {
-                for (var i = 0; i < namedType.TypeArguments.Length; i++)
-                {
-                  var typeArgument = namedType.TypeArguments[i];
-                  var typeParameter = namedType.TypeParameters[i];
-                  if (typeArgument.Kind == SymbolKind.TypeParameter)
-                    parameterTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
-                  else if (typeArgument.Kind == SymbolKind.NamedType)
-                    parameterTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
-                }
+                parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.TypeKind, arrayTypeSymbol.ElementType?.Name, arrayTypeSymbol.ElementType?.ContainingNamespace.ToString(), parameterTypeArguments));
               }
-              parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.Name, parameter.Type?.ContainingNamespace.ToString(), parameterTypeArguments));
+              else
+              {
+                if (parameter.Type is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.Arity > 0)
+                {
+                  for (var i = 0; i < namedType.TypeArguments.Length; i++)
+                  {
+                    var typeArgument = namedType.TypeArguments[i];
+                    var typeParameter = namedType.TypeParameters[i];
+                    if (typeArgument.Kind == SymbolKind.TypeParameter)
+                      parameterTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                    else if (typeArgument.Kind == SymbolKind.NamedType)
+                      parameterTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
+                  }
+                }
+                parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.TypeKind, parameter.Type?.Name, parameter.Type?.ContainingNamespace.ToString(), parameterTypeArguments));
+              }
             }
 
           string? returnType = null;
@@ -501,6 +508,8 @@ public class SutAttribute<T>() : System.Attribute {}
         parameterType = $"{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
       else
         parameterType = $"{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
+      if (parameter.TypeKind == TypeKind.Array)
+        parameterType += "[]";
       sb.Append($"      System.Linq.Expressions.Expression<System.Func<{parameterType}, System.Boolean>> {parameterName}");
       if (i < dependencyMember.Parameters.Count - 1 || hasReturnValue || setupException) sb.Append(",");
       sb.AppendLine();
@@ -538,6 +547,8 @@ public class SutAttribute<T>() : System.Attribute {}
           parameterType = $"{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
         else
           parameterType = $"{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
+        if (parameter.TypeKind == TypeKind.Array)
+          parameterType += "[]";
         sb.Append($"            It.Is<{parameterType}>({parameterName})");
         if (!parameter.Equals(dependencyMember.Parameters.Last())) sb.Append(",");
         sb.AppendLine();
