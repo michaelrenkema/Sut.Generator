@@ -121,6 +121,30 @@ namespace Test;
 [Sut<Example9>]
 public partial class Test9 {}
 """
+      },
+      {
+        10,
+        """
+using Sut;
+using Sut.Generator.Example;
+
+namespace Test;
+
+[Sut<Example10>]
+public partial class Test10 {}
+"""
+      },
+      {
+        11,
+        """
+using Sut;
+using Sut.Generator.Example;
+
+namespace Test;
+
+[Sut<Example11>]
+public partial class Test11 {}
+"""
       }
     };
   }
@@ -135,6 +159,8 @@ public partial class Test9 {}
   [Arguments(7)]
   [Arguments(8)]
   [Arguments(9)]
+  [Arguments(10)]
+  [Arguments(11)]
   public Task Test(int index)
   {
     var source = Tests[index];
@@ -160,6 +186,8 @@ public partial class Test9 {}
     GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
     driver = driver.RunGenerators(compilation);
+
+    VerifierSettings.DisableRequireUniquePrefix();
 
     return Verify(driver)
       .UseDirectory("Snapshots");
