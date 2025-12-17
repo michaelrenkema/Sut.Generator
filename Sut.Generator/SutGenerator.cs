@@ -288,6 +288,19 @@ public class SutAttribute<T>() : System.Attribute {}
               var taskTypeArgument = namedType.TypeArguments.First();
               returnType = taskTypeArgument.Name;
               returnTypeNamespace = taskTypeArgument.ContainingNamespace.ToString();
+
+              if (taskTypeArgument is INamedTypeSymbol taskNamedType && taskNamedType.IsGenericType && taskNamedType.TypeArguments.Length > 0)
+              {
+                for (var i = 0; i < taskNamedType.TypeArguments.Length; i++)
+                {
+                  var typeArgument = taskNamedType.TypeArguments[i];
+                  var typeParameter = taskNamedType.TypeParameters[i];
+                  if (typeArgument.Kind == SymbolKind.TypeParameter)
+                    returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                  else if (typeArgument.Kind == SymbolKind.NamedType)
+                    returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
+                }
+              }
             }
           }
           else if (!methodSymbol.ReturnsVoid)
