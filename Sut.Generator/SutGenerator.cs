@@ -258,6 +258,14 @@ public class SutAttribute<T>() : System.Attribute {}
               {
                 parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.TypeKind, arrayTypeSymbol.ElementType?.Name, arrayTypeSymbol.ElementType?.ContainingNamespace.ToString(), parameterTypeArguments));
               }
+              else if (parameter.Type is ITypeParameterSymbol typeParameterSymbol)
+              {
+                var dependencyTypeArgument = dependency.TypeArguments.FirstOrDefault(t => t.TypeParameter == parameter.Type?.Name);
+                if (dependencyTypeArgument != default)
+                  parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.TypeKind, dependencyTypeArgument.TypeArgument, dependencyTypeArgument.TypeArgumentNamespace, parameterTypeArguments));
+                else
+                  parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.TypeKind, parameter.Type?.Name, parameter.Type?.ContainingNamespace.ToString(), parameterTypeArguments));
+              }
               else
               {
                 if (parameter.Type is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.Arity > 0)
@@ -296,7 +304,13 @@ public class SutAttribute<T>() : System.Attribute {}
                   var typeArgument = taskNamedType.TypeArguments[i];
                   var typeParameter = taskNamedType.TypeParameters[i];
                   if (typeArgument.Kind == SymbolKind.TypeParameter)
-                    returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                  {
+                    var dependencyTypeArgument = dependency.TypeArguments?.FirstOrDefault(t => t.TypeParameter == typeArgument.Name);
+                    if (dependencyTypeArgument is not null)
+                      returnTypeArguments.Add(new("", dependencyTypeArgument!.Value.TypeArgument, dependencyTypeArgument!.Value.TypeArgumentNamespace));
+                    else
+                      returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                  }
                   else if (typeArgument.Kind == SymbolKind.NamedType)
                     returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
                 }

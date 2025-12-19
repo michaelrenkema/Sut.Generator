@@ -14,13 +14,13 @@ public partial class Test11 {
     public Mock<IDependency8<Command>> Dependency8 { get; } = new();
 
     public Builder With_Dependency8_Get(
-      System.Linq.Expressions.Expression<System.Func<T, System.Boolean>> input,
-      System.Nullable<T> returns
+      System.Linq.Expressions.Expression<System.Func<Command, System.Boolean>> input,
+      System.Nullable<Command> returns
     ) {
       Dependency8
         .Setup(x =>
           x.Get(
-            It.Is<T>(input)
+            It.Is<Command>(input)
           )
         )
         .ReturnsAsync(returns)
@@ -29,13 +29,13 @@ public partial class Test11 {
     }
 
     public Builder With_Dependency8_Get_Exception(
-      System.Linq.Expressions.Expression<System.Func<T, System.Boolean>> input,
+      System.Linq.Expressions.Expression<System.Func<Command, System.Boolean>> input,
       System.Exception exception
     ) {
       Dependency8
         .Setup(x =>
           x.Get(
-            It.Is<T>(input)
+            It.Is<Command>(input)
           )
         )
         .ThrowsAsync(exception);
