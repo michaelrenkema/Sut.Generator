@@ -294,25 +294,43 @@ public class SutAttribute<T>() : System.Attribute {}
             if (methodSymbol.ReturnType is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.TypeArguments.Length > 0)
             {
               var taskTypeArgument = namedType.TypeArguments.First();
-              returnType = taskTypeArgument.Name;
-              returnTypeNamespace = taskTypeArgument.ContainingNamespace.ToString();
 
-              if (taskTypeArgument is INamedTypeSymbol taskNamedType && taskNamedType.IsGenericType && taskNamedType.TypeArguments.Length > 0)
+              if (taskTypeArgument is ITypeParameterSymbol typeParameterSymbol)
               {
-                for (var i = 0; i < taskNamedType.TypeArguments.Length; i++)
+                var dependencyTypeArgument = dependency.TypeArguments.FirstOrDefault(t => t.TypeParameter == taskTypeArgument?.Name);
+                if (dependencyTypeArgument != default)
                 {
-                  var typeArgument = taskNamedType.TypeArguments[i];
-                  var typeParameter = taskNamedType.TypeParameters[i];
-                  if (typeArgument.Kind == SymbolKind.TypeParameter)
+                  returnType = dependencyTypeArgument!.TypeArgument;
+                  returnTypeNamespace = dependencyTypeArgument!.TypeArgumentNamespace;
+                }
+                else
+                {
+                  returnType = taskTypeArgument.Name;
+                  returnTypeNamespace = taskTypeArgument.ContainingNamespace.ToString();
+                }
+              }
+              else
+              {
+                returnType = taskTypeArgument.Name;
+                returnTypeNamespace = taskTypeArgument.ContainingNamespace.ToString();
+
+                if (taskTypeArgument is INamedTypeSymbol taskNamedType && taskNamedType.IsGenericType && taskNamedType.TypeArguments.Length > 0)
+                {
+                  for (var i = 0; i < taskNamedType.TypeArguments.Length; i++)
                   {
-                    var dependencyTypeArgument = dependency.TypeArguments?.FirstOrDefault(t => t.TypeParameter == typeArgument.Name);
-                    if (dependencyTypeArgument is not null)
-                      returnTypeArguments.Add(new("", dependencyTypeArgument!.Value.TypeArgument, dependencyTypeArgument!.Value.TypeArgumentNamespace));
-                    else
-                      returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                    var typeArgument = taskNamedType.TypeArguments[i];
+                    var typeParameter = taskNamedType.TypeParameters[i];
+                    if (typeArgument.Kind == SymbolKind.TypeParameter)
+                    {
+                      var dependencyTypeArgument = dependency.TypeArguments?.FirstOrDefault(t => t.TypeParameter == typeArgument.Name);
+                      if (dependencyTypeArgument != default)
+                        returnTypeArguments.Add(new("", dependencyTypeArgument!.Value.TypeArgument, dependencyTypeArgument!.Value.TypeArgumentNamespace));
+                      else
+                        returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                    }
+                    else if (typeArgument.Kind == SymbolKind.NamedType)
+                      returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
                   }
-                  else if (typeArgument.Kind == SymbolKind.NamedType)
-                    returnTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
                 }
               }
             }
@@ -360,7 +378,7 @@ public class SutAttribute<T>() : System.Attribute {}
         TypeName = dependency.TypeName,
         TypeNamespace = dependency.TypeNamespace,
         TypeKind = dependency.TypeKind,
-        TypeArguments = dependency.TypeArguments,
+        TypeArguments = dependency.TypeArguments!,
         Source = dependency.Source,
         SourceVersion = dependency.SourceVersion,
         IsSealed = dependency.IsSealed,
