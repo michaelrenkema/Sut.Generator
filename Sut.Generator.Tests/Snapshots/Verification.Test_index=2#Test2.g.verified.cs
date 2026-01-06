@@ -11,21 +11,21 @@ public partial class Test2 {
   private Builder Sut { get; } = new();
 
   private class Builder {
-    public Mock<Microsoft.Extensions.Logging.ILogger<Example2>> Logger { get; } = new();
+    public Mock<global::Microsoft.Extensions.Logging.ILogger<Example2>> Logger { get; } = new();
 
     public Builder With_Logger(
-      Microsoft.Extensions.Logging.LogLevel logLevel,
+      global::Microsoft.Extensions.Logging.LogLevel logLevel,
       string message,
-      System.Exception? exception = null
+      global::System.Exception? exception = null
     ) {
       Logger
         .Setup(x =>
           x.Log(
-            It.Is<Microsoft.Extensions.Logging.LogLevel>(l => l == logLevel),
-            It.IsAny<Microsoft.Extensions.Logging.EventId>(),
+            It.Is<global::Microsoft.Extensions.Logging.LogLevel>(l => l == logLevel),
+            It.IsAny<global::Microsoft.Extensions.Logging.EventId>(),
             It.Is<It.IsAnyType>((v, t) => v.ToString() == message),
-            It.Is<System.Exception?>(e => e == exception),
-            It.IsAny<System.Func<It.IsAnyType, System.Exception?, string>>()
+            It.Is<global::System.Exception?>(e => e == exception),
+            It.IsAny<global::System.Func<It.IsAnyType, global::System.Exception?, string>>()
           )
         )
         .Verifiable();

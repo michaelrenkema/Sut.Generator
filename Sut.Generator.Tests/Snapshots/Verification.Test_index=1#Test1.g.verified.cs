@@ -11,12 +11,12 @@ public partial class Test1 {
   private Builder Sut { get; } = new();
 
   private class Builder {
-    public Microsoft.Extensions.Options.IOptions<TestOptions>? Options { get; private set; }
+    public global::Microsoft.Extensions.Options.IOptions<TestOptions>? Options { get; private set; }
 
     public Builder With_Options(
       TestOptions options
     ) {
-      Options = Microsoft.Extensions.Options.Options.Create(options);
+      Options = global::Microsoft.Extensions.Options.Options.Create(options);
       return this;
     }
 

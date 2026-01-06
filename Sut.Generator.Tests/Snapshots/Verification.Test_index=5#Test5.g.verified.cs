@@ -14,7 +14,7 @@ public partial class Test5 {
     public Mock<IDependency2<Command>> Dependency2 { get; } = new();
 
     public Builder<Command> With_Dependency2_Get(
-      System.Collections.Generic.List<Command> returns
+      global::System.Collections.Generic.List<Command> returns
     ) {
       Dependency2
         .Setup(x =>
@@ -26,7 +26,7 @@ public partial class Test5 {
     }
 
     public Builder<Command> With_Dependency2_Get_Exception(
-      System.Exception exception
+      global::System.Exception exception
     ) {
       Dependency2
         .Setup(x =>

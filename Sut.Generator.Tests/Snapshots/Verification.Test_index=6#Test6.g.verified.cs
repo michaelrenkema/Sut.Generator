@@ -14,7 +14,7 @@ public partial class Test6 {
     public Mock<IDependency3> Dependency3 { get; } = new();
 
     public Builder With_Dependency3_Run(
-      System.Linq.Expressions.Expression<System.Func<Command, System.Boolean>> command
+      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> command
     ) {
       Dependency3
         .Setup(x =>
@@ -27,8 +27,8 @@ public partial class Test6 {
     }
 
     public Builder With_Dependency3_Run_Exception(
-      System.Linq.Expressions.Expression<System.Func<Command, System.Boolean>> command,
-      System.Exception exception
+      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> command,
+      global::System.Exception exception
     ) {
       Dependency3
         .Setup(x =>

@@ -39,7 +39,7 @@ public static class Extensions
           if (!string.IsNullOrEmpty(sutTypeArgument.TypeArgumentNamespace)
             && sutTypeArgument.TypeArgumentNamespace != sut.Namespace)
           {
-            sb.Append($"{sutTypeArgument.TypeArgumentNamespace}.");
+            sb.Append($"global::{sutTypeArgument.TypeArgumentNamespace}.");
           }
           sb.Append(sutTypeArgument.TypeArgument);
         }
@@ -48,7 +48,7 @@ public static class Extensions
           if (!string.IsNullOrEmpty(typeArgument.TypeArgumentNamespace)
             && typeArgument.TypeArgumentNamespace != sut.Namespace)
           {
-            sb.Append($"{typeArgument.TypeArgumentNamespace}.");
+            sb.Append($"global::{typeArgument.TypeArgumentNamespace}.");
           }
           sb.Append($"{typeArguments[i].TypeArgument}");
         }

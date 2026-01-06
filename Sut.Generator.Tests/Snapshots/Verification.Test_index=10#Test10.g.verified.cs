@@ -14,13 +14,13 @@ public partial class Test10 {
     public Mock<IDependency7> Dependency7 { get; } = new();
 
     public Builder With_Dependency7_Get(
-      System.Linq.Expressions.Expression<System.Func<System.Int32[], System.Boolean>> ids,
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.Int32[], global::System.Boolean>> ids,
       Command returns
     ) {
       Dependency7
         .Setup(x =>
           x.Get(
-            It.Is<System.Int32[]>(ids)
+            It.Is<global::System.Int32[]>(ids)
           )
         )
         .ReturnsAsync(returns)
@@ -29,13 +29,13 @@ public partial class Test10 {
     }
 
     public Builder With_Dependency7_Get_Exception(
-      System.Linq.Expressions.Expression<System.Func<System.Int32[], System.Boolean>> ids,
-      System.Exception exception
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.Int32[], global::System.Boolean>> ids,
+      global::System.Exception exception
     ) {
       Dependency7
         .Setup(x =>
           x.Get(
-            It.Is<System.Int32[]>(ids)
+            It.Is<global::System.Int32[]>(ids)
           )
         )
         .ThrowsAsync(exception);
