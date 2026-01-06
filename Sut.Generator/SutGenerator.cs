@@ -38,7 +38,7 @@ public class SutAttribute<T>() : System.Attribute {}
     IncrementalValuesProvider<SutIncrementalValues?> members = dependencies
       .Select((value, _) => GetDependencyMembers(value.Sut, value.Compilation.GetSemanticModel(value.Sut?.Node.SyntaxTree!)));
 
-    context.RegisterSourceOutput(members, static (spc, source) => Execute(spc, source?.Sut));
+    context.RegisterImplementationSourceOutput(members, static (spc, source) => Execute(spc, source?.Sut));
   }
 
   public static bool IsSyntaxTargetForGeneration(SyntaxNode node)
@@ -413,17 +413,17 @@ public class SutAttribute<T>() : System.Attribute {}
 
         string dependencyType;
         if (dependency.TypeNamespace != sut?.Namespace)
-          dependencyType = $"{dependency.TypeNamespace}.{dependency.TypeName}{dependency.TypeArguments.Format(sut!.Value)}";
+          dependencyType = $"global::{dependency.TypeNamespace}.{dependency.TypeName}{dependency.TypeArguments.Format(sut!.Value)}";
         else
           dependencyType = $"{dependency.TypeName}{dependency.TypeArguments.Format(sut!.Value)}";
 
         if (dependency.IsOptions())
         {
-          sb.AppendLine($"    public Microsoft.Extensions.Options.IOptions<{dependency.TypeArguments[0].TypeArgument}>? {dependencyName} {{ get; private set; }}");
+          sb.AppendLine($"    public global::Microsoft.Extensions.Options.IOptions<{dependency.TypeArguments[0].TypeArgument}>? {dependencyName} {{ get; private set; }}");
         }
         else if (dependency.IsLogger())
         {
-          sb.AppendLine($"    public Mock<Microsoft.Extensions.Logging.ILogger<{dependency.TypeArguments[0].TypeArgument}>> {dependencyName} {{ get; }} = new();");
+          sb.AppendLine($"    public Mock<global::Microsoft.Extensions.Logging.ILogger<{dependency.TypeArguments[0].TypeArgument}>> {dependencyName} {{ get; }} = new();");
         }
         else if (!dependency.IsSealed &&
           (dependency.TypeKind == TypeKind.Interface || dependency.TypeKind == TypeKind.Class))
@@ -459,7 +459,7 @@ public class SutAttribute<T>() : System.Attribute {}
               {
                 case MethodKind.PropertyGet:
                 case MethodKind.PropertySet:
-                  sb.AppendLine(GeneratePropertySetupMethod(dependency, dependencyMember, builderName));
+                  sb.AppendLine(GeneratePropertySetupMethod((Sut)sut, dependency, dependencyMember, builderName));
                   break;
                 default:
                   sb.AppendLine(GenerateSetupMethod((Sut)sut, dependency, dependencyMember, builderName, false));
@@ -532,12 +532,12 @@ public class SutAttribute<T>() : System.Attribute {}
       var parameterName = CodeIdentifier.MakeCamel(parameter.Name);
       string parameterType;
       if (parameter.TypeNamespace != sut.Namespace)
-        parameterType = $"{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
+        parameterType = $"global::{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
       else
         parameterType = $"{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
       if (parameter.TypeKind == TypeKind.Array)
         parameterType += "[]";
-      sb.Append($"      System.Linq.Expressions.Expression<System.Func<{parameterType}, System.Boolean>> {parameterName}");
+      sb.Append($"      global::System.Linq.Expressions.Expression<global::System.Func<{parameterType}, global::System.Boolean>> {parameterName}");
       if (i < dependencyMember.Parameters.Count - 1 || hasReturnValue || setupException) sb.Append(",");
       sb.AppendLine();
     }
@@ -546,14 +546,14 @@ public class SutAttribute<T>() : System.Attribute {}
     {
       string dependencyType;
       if (dependencyMember.ReturnTypeNamespace != sut.Namespace)
-        dependencyType = $"{dependencyMember.ReturnTypeNamespace}.{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
+        dependencyType = $"global::{dependencyMember.ReturnTypeNamespace}.{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
       else
         dependencyType = $"{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
       sb.AppendLine($"      {dependencyType} returns");
     }
     else if (setupException)
     {
-      sb.AppendLine("      System.Exception exception");
+      sb.AppendLine("      global::System.Exception exception");
     }
 
     sb.AppendLine("    ) {");
@@ -571,7 +571,7 @@ public class SutAttribute<T>() : System.Attribute {}
         var parameterName = CodeIdentifier.MakeCamel(parameter.Name);
         string parameterType;
         if (parameter.TypeNamespace != sut.Namespace)
-          parameterType = $"{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
+          parameterType = $"global::{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
         else
           parameterType = $"{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
         if (parameter.TypeKind == TypeKind.Array)
@@ -633,7 +633,7 @@ public class SutAttribute<T>() : System.Attribute {}
 
     sb.AppendLine($"      {@type} {dependency.Name}");
     sb.AppendLine("    ) {");
-    sb.AppendLine($"      {dependencyName} = Microsoft.Extensions.Options.Options.Create({dependency.Name});");
+    sb.AppendLine($"      {dependencyName} = global::Microsoft.Extensions.Options.Options.Create({dependency.Name});");
     sb.AppendLine("      return this;");
     sb.AppendLine("    }");
 
@@ -647,18 +647,18 @@ public class SutAttribute<T>() : System.Attribute {}
     var dependencyName = CodeIdentifier.MakePascal(dependency.Name);
 
     sb.AppendLine($"    public {builderName} With_Logger(");
-    sb.AppendLine("      Microsoft.Extensions.Logging.LogLevel logLevel,");
+    sb.AppendLine("      global::Microsoft.Extensions.Logging.LogLevel logLevel,");
     sb.AppendLine("      string message,");
-    sb.AppendLine("      System.Exception? exception = null");
+    sb.AppendLine("      global::System.Exception? exception = null");
     sb.AppendLine("    ) {");
     sb.AppendLine($"      {dependencyName}");
     sb.AppendLine("        .Setup(x =>");
     sb.AppendLine("          x.Log(");
-    sb.AppendLine("            It.Is<Microsoft.Extensions.Logging.LogLevel>(l => l == logLevel),");
-    sb.AppendLine("            It.IsAny<Microsoft.Extensions.Logging.EventId>(),");
+    sb.AppendLine("            It.Is<global::Microsoft.Extensions.Logging.LogLevel>(l => l == logLevel),");
+    sb.AppendLine("            It.IsAny<global::Microsoft.Extensions.Logging.EventId>(),");
     sb.AppendLine("            It.Is<It.IsAnyType>((v, t) => v.ToString() == message),");
-    sb.AppendLine("            It.Is<System.Exception?>(e => e == exception),");
-    sb.AppendLine("            It.IsAny<System.Func<It.IsAnyType, System.Exception?, string>>()");
+    sb.AppendLine("            It.Is<global::System.Exception?>(e => e == exception),");
+    sb.AppendLine("            It.IsAny<global::System.Func<It.IsAnyType, global::System.Exception?, string>>()");
     sb.AppendLine("          )");
     sb.AppendLine("        )");
     sb.AppendLine("        .Verifiable();");
@@ -667,7 +667,8 @@ public class SutAttribute<T>() : System.Attribute {}
 
     return sb.ToString();
   }
-  private static string GeneratePropertySetupMethod(SutDependency dependency, SutDependencyMember dependencyMember, string builderName)
+
+  private static string GeneratePropertySetupMethod(Sut sut, SutDependency dependency, SutDependencyMember dependencyMember, string builderName)
   {
     var sb = new StringBuilder();
 
@@ -678,9 +679,16 @@ public class SutAttribute<T>() : System.Attribute {}
     sb.AppendLine("(");
 
     if (dependencyMember.Kind == MethodKind.PropertyGet)
-      sb.AppendLine($"      {dependencyMember.ReturnType} {dependencyMemberName}");
+    {
+      string returnType;
+      if (dependencyMember.ReturnTypeNamespace != sut.Namespace)
+        returnType = $"global::{dependencyMember.ReturnTypeNamespace}.{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
+      else
+        returnType = $"{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
+      sb.AppendLine($"      {returnType} {dependencyMemberName}");
+    }
     else if (dependencyMember.Kind == MethodKind.PropertySet)
-      sb.AppendLine($"      System.Action<{dependencyName}> {dependencyMemberName}");
+      sb.AppendLine($"      global::System.Action<{dependencyName}> {dependencyMemberName}");
 
     sb.AppendLine("    ) {");
     sb.AppendLine($"      {dependencyName}");

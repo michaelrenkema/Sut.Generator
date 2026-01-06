@@ -24,7 +24,7 @@ public partial class Test8 {
     }
 
     public Builder With_Dependency4_Status(
-      System.Action<Dependency4> status
+      global::System.Action<Dependency4> status
     ) {
       Dependency4
         .SetupSet(status)

@@ -14,8 +14,8 @@ public partial class Test11 {
     public Mock<IDependency8<Command>> Dependency8 { get; } = new();
 
     public Builder With_Dependency8_Get(
-      System.Linq.Expressions.Expression<System.Func<Command, System.Boolean>> input,
-      System.Nullable<Command> returns
+      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> input,
+      global::System.Nullable<Command> returns
     ) {
       Dependency8
         .Setup(x =>
@@ -29,8 +29,8 @@ public partial class Test11 {
     }
 
     public Builder With_Dependency8_Get_Exception(
-      System.Linq.Expressions.Expression<System.Func<Command, System.Boolean>> input,
-      System.Exception exception
+      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> input,
+      global::System.Exception exception
     ) {
       Dependency8
         .Setup(x =>

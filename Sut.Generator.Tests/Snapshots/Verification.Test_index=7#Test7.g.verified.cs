@@ -14,7 +14,7 @@ public partial class Test7 {
     public Mock<Dependency5> Dependency5 { get; } = new();
 
     public Builder With_Dependency5_Update<T>(
-      System.Linq.Expressions.Expression<System.Func<T, System.Boolean>> input,
+      global::System.Linq.Expressions.Expression<global::System.Func<T, global::System.Boolean>> input,
       T returns
     ) {
       Dependency5
@@ -29,8 +29,8 @@ public partial class Test7 {
     }
 
     public Builder With_Dependency5_Update_Exception<T>(
-      System.Linq.Expressions.Expression<System.Func<T, System.Boolean>> input,
-      System.Exception exception
+      global::System.Linq.Expressions.Expression<global::System.Func<T, global::System.Boolean>> input,
+      global::System.Exception exception
     ) {
       Dependency5
         .Setup(x =>

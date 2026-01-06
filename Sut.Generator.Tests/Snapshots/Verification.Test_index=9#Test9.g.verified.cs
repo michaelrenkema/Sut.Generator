@@ -14,15 +14,15 @@ public partial class Test9 {
     public Mock<Dependency6> Dependency6 { get; } = new();
 
     public Builder With_Dependency6_Evaluate(
-      System.Linq.Expressions.Expression<System.Func<System.Func<Command, System.Boolean>, System.Boolean>> predicate,
-      System.Linq.Expressions.Expression<System.Func<System.Threading.CancellationToken, System.Boolean>> cancellationToken,
-      System.Boolean returns
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.Func<Command, global::System.Boolean>, global::System.Boolean>> predicate,
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.Threading.CancellationToken, global::System.Boolean>> cancellationToken,
+      global::System.Boolean returns
     ) {
       Dependency6
         .Setup(x =>
           x.Evaluate(
-            It.Is<System.Func<Command, System.Boolean>>(predicate),
-            It.Is<System.Threading.CancellationToken>(cancellationToken)
+            It.Is<global::System.Func<Command, global::System.Boolean>>(predicate),
+            It.Is<global::System.Threading.CancellationToken>(cancellationToken)
           )
         )
         .Returns(returns)
@@ -31,15 +31,15 @@ public partial class Test9 {
     }
 
     public Builder With_Dependency6_Evaluate_Exception(
-      System.Linq.Expressions.Expression<System.Func<System.Func<Command, System.Boolean>, System.Boolean>> predicate,
-      System.Linq.Expressions.Expression<System.Func<System.Threading.CancellationToken, System.Boolean>> cancellationToken,
-      System.Exception exception
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.Func<Command, global::System.Boolean>, global::System.Boolean>> predicate,
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.Threading.CancellationToken, global::System.Boolean>> cancellationToken,
+      global::System.Exception exception
     ) {
       Dependency6
         .Setup(x =>
           x.Evaluate(
-            It.Is<System.Func<Command, System.Boolean>>(predicate),
-            It.Is<System.Threading.CancellationToken>(cancellationToken)
+            It.Is<global::System.Func<Command, global::System.Boolean>>(predicate),
+            It.Is<global::System.Threading.CancellationToken>(cancellationToken)
           )
         )
         .Throws(exception);
