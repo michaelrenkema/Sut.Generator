@@ -256,6 +256,18 @@ public class SutAttribute<T>() : System.Attribute {}
               var parameterTypeArguments = new EquatableList<SutTypeArgument>();
               if (parameter.Type is IArrayTypeSymbol arrayTypeSymbol)
               {
+                if (arrayTypeSymbol.ElementType is INamedTypeSymbol namedType && namedType.IsGenericType && namedType.Arity > 0)
+                {
+                  for (var i = 0; i < namedType.TypeArguments.Length; i++)
+                  {
+                    var typeArgument = namedType.TypeArguments[i];
+                    var typeParameter = namedType.TypeParameters[i];
+                    if (typeArgument.Kind == SymbolKind.TypeParameter)
+                      parameterTypeArguments.Add(new(typeParameter.Name, typeArgument.Name));
+                    else if (typeArgument.Kind == SymbolKind.NamedType)
+                      parameterTypeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
+                  }
+                }
                 parameters.Add(new SutDependencyMemberParameter(parameter.Name, parameter.Type?.TypeKind, arrayTypeSymbol.ElementType?.Name, arrayTypeSymbol.ElementType?.ContainingNamespace.ToString(), parameterTypeArguments));
               }
               else if (parameter.Type is ITypeParameterSymbol typeParameterSymbol)
