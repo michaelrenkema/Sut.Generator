@@ -14,15 +14,21 @@ public partial class Test13 {
     public Mock<IDependency10> Dependency10 { get; } = new();
 
     public Builder With_Dependency10_Get(
-      global::System.Linq.Expressions.Expression<global::System.Func<global::System.ValueTuple<global::System.String, global::System.String>[], global::System.Boolean>> parameters
+      global::System.Linq.Expressions.Expression<global::System.Func<global::System.ValueTuple<global::System.String, global::System.String>[], global::System.Boolean>> parameters,
+      global::System.Action<global::System.ValueTuple<global::System.String, global::System.String>[]>? callback = null
     ) {
-      Dependency10
+      var setup = Dependency10
         .Setup(x =>
           x.Get(
             It.Is<global::System.ValueTuple<global::System.String, global::System.String>[]>(parameters)
           )
-        )
-        .Verifiable();
+        );
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 

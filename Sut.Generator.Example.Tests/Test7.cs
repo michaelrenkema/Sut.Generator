@@ -10,11 +10,14 @@ public partial class Test7
   public async Task Success()
   {
     var command = new Command(1);
+    Command? updated = null;
 
     var sut = this.Sut
-      .With_Dependency5_Update<Command>(c => c.Id == command.Id, command)
+      .With_Dependency5_Update<Command>(c => c.Id == command.Id, command, (c) => updated = c)
       .Build();
 
     await sut.Update(command);
+
+    await Assert.That(updated).IsEquivalentTo(command);
   }
 }

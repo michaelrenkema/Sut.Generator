@@ -15,16 +15,22 @@ public partial class Test7 {
 
     public Builder With_Dependency5_Update<T>(
       global::System.Linq.Expressions.Expression<global::System.Func<T, global::System.Boolean>> input,
-      T returns
+      T returns,
+      global::System.Action<T>? callback = null
     ) {
-      Dependency5
+      var setup = Dependency5
         .Setup(x =>
           x.Update(
             It.Is<T>(input)
           )
         )
-        .ReturnsAsync(returns)
-        .Verifiable();
+        .ReturnsAsync(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 

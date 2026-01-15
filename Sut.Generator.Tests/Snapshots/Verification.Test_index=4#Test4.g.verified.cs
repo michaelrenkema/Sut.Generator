@@ -15,16 +15,22 @@ public partial class Test4 {
 
     public Builder With_Dependency1_Get(
       global::System.Linq.Expressions.Expression<global::System.Func<global::System.Int32, global::System.Boolean>> id,
-      Command returns
+      Command returns,
+      global::System.Action<global::System.Int32>? callback = null
     ) {
-      Dependency1
+      var setup = Dependency1
         .Setup(x =>
           x.Get(
             It.Is<global::System.Int32>(id)
           )
         )
-        .ReturnsAsync(returns)
-        .Verifiable();
+        .ReturnsAsync(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 

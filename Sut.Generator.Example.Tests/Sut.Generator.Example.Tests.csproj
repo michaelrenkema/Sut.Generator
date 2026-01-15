@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="10.2.0" />
     <PackageReference Include="Sut.Generator" Version="0.0.0-pre" />
     <PackageReference Include="TUnit" Version="0.23.5" />
   </ItemGroup>

@@ -14,15 +14,21 @@ public partial class Test6 {
     public Mock<IDependency3> Dependency3 { get; } = new();
 
     public Builder With_Dependency3_Run(
-      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> command
+      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> command,
+      global::System.Action<Command>? callback = null
     ) {
-      Dependency3
+      var setup = Dependency3
         .Setup(x =>
           x.Run(
             It.Is<Command>(command)
           )
-        )
-        .Verifiable();
+        );
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 
