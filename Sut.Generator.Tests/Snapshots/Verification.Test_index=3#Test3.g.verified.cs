@@ -12,7 +12,7 @@ public partial class Test3 {
 
   private class Builder {
     public global::Microsoft.Extensions.Options.IOptions<TestOptions>? Options { get; private set; }
-    public Mock<global::Microsoft.Extensions.Logging.ILogger<Example3>> Logger { get; } = new();
+    public global::Microsoft.Extensions.Logging.ILogger<Example3> Logger { get; private set; }
     public Mock<IDependency1> Dependency1 { get; } = new();
     public Mock<IDependency3> Dependency3 { get; } = new();
     public Mock<Dependency4> Dependency4 { get; } = new();
@@ -27,36 +27,30 @@ public partial class Test3 {
     }
 
     public Builder With_Logger(
-      global::Microsoft.Extensions.Logging.LogLevel logLevel,
-      string message,
-      global::System.Exception? exception = null
+      global::Microsoft.Extensions.Logging.ILogger<Example3> logger
     ) {
-      Logger
-        .Setup(x =>
-          x.Log(
-            It.Is<global::Microsoft.Extensions.Logging.LogLevel>(l => l == logLevel),
-            It.IsAny<global::Microsoft.Extensions.Logging.EventId>(),
-            It.Is<It.IsAnyType>((v, t) => v.ToString() == message),
-            It.Is<global::System.Exception?>(e => e == exception),
-            It.IsAny<global::System.Func<It.IsAnyType, global::System.Exception?, string>>()
-          )
-        )
-        .Verifiable();
+      Logger = logger;
       return this;
     }
 
     public Builder With_Dependency1_Get(
       global::System.Linq.Expressions.Expression<global::System.Func<global::System.Int32, global::System.Boolean>> id,
-      Command returns
+      Command returns,
+      global::System.Action<global::System.Int32>? callback = null
     ) {
-      Dependency1
+      var setup = Dependency1
         .Setup(x =>
           x.Get(
             It.Is<global::System.Int32>(id)
           )
         )
-        .ReturnsAsync(returns)
-        .Verifiable();
+        .ReturnsAsync(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 
@@ -75,15 +69,21 @@ public partial class Test3 {
     }
 
     public Builder With_Dependency3_Run(
-      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> command
+      global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> command,
+      global::System.Action<Command>? callback = null
     ) {
-      Dependency3
+      var setup = Dependency3
         .Setup(x =>
           x.Run(
             It.Is<Command>(command)
           )
-        )
-        .Verifiable();
+        );
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 
@@ -122,16 +122,22 @@ public partial class Test3 {
 
     public Builder With_Dependency5_Update<T>(
       global::System.Linq.Expressions.Expression<global::System.Func<T, global::System.Boolean>> input,
-      T returns
+      T returns,
+      global::System.Action<T>? callback = null
     ) {
-      Dependency5
+      var setup = Dependency5
         .Setup(x =>
           x.Update(
             It.Is<T>(input)
           )
         )
-        .ReturnsAsync(returns)
-        .Verifiable();
+        .ReturnsAsync(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 
@@ -152,17 +158,23 @@ public partial class Test3 {
     public Builder With_Dependency6_Evaluate(
       global::System.Linq.Expressions.Expression<global::System.Func<global::System.Func<Command, global::System.Boolean>, global::System.Boolean>> predicate,
       global::System.Linq.Expressions.Expression<global::System.Func<global::System.Threading.CancellationToken, global::System.Boolean>> cancellationToken,
-      global::System.Boolean returns
+      global::System.Boolean returns,
+      global::System.Action<global::System.Func<Command, global::System.Boolean>, global::System.Threading.CancellationToken>? callback = null
     ) {
-      Dependency6
+      var setup = Dependency6
         .Setup(x =>
           x.Evaluate(
             It.Is<global::System.Func<Command, global::System.Boolean>>(predicate),
             It.Is<global::System.Threading.CancellationToken>(cancellationToken)
           )
         )
-        .Returns(returns)
-        .Verifiable();
+        .Returns(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 
@@ -185,7 +197,7 @@ public partial class Test3 {
     public Example3 Build() {
       return new Example3(
         Options!,
-        Logger.Object,
+        Logger!,
         Dependency1.Object,
         Dependency3.Object,
         Dependency4.Object,

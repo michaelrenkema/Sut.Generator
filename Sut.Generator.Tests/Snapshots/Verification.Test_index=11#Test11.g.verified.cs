@@ -15,16 +15,22 @@ public partial class Test11 {
 
     public Builder With_Dependency8_Get(
       global::System.Linq.Expressions.Expression<global::System.Func<Command, global::System.Boolean>> input,
-      global::System.Nullable<Command> returns
+      global::System.Nullable<Command> returns,
+      global::System.Action<Command>? callback = null
     ) {
-      Dependency8
+      var setup = Dependency8
         .Setup(x =>
           x.Get(
             It.Is<Command>(input)
           )
         )
-        .ReturnsAsync(returns)
-        .Verifiable();
+        .ReturnsAsync(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 

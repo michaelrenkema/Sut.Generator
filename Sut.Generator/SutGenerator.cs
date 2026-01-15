@@ -313,11 +313,15 @@ public class SutAttribute<T>() : System.Attribute {}
                 if (dependencyTypeArgument != default)
                 {
                   returnType = dependencyTypeArgument!.TypeArgument;
+                  if (typeParameterSymbol.NullableAnnotation == NullableAnnotation.Annotated)
+                    returnType += "?";
                   returnTypeNamespace = dependencyTypeArgument!.TypeArgumentNamespace;
                 }
                 else
                 {
                   returnType = taskTypeArgument.Name;
+                  if (typeParameterSymbol.NullableAnnotation == NullableAnnotation.Annotated)
+                    returnType += "?";
                   returnTypeNamespace = taskTypeArgument.ContainingNamespace.ToString();
                 }
               }
@@ -453,7 +457,7 @@ public class SutAttribute<T>() : System.Attribute {}
         }
         else if (dependency.IsLogger())
         {
-          sb.AppendLine($"    public Mock<global::Microsoft.Extensions.Logging.ILogger<{dependency.TypeArguments[0].TypeArgument}>> {dependencyName} {{ get; }} = new();");
+          sb.AppendLine($"    public global::Microsoft.Extensions.Logging.ILogger<{dependency.TypeArguments[0].TypeArgument}>? {dependencyName} {{ get; private set; }}");
         }
         else if (!dependency.IsSealed &&
           (dependency.TypeKind == TypeKind.Interface || dependency.TypeKind == TypeKind.Class))
@@ -516,12 +520,12 @@ public class SutAttribute<T>() : System.Attribute {}
 
       var dependencyName = CodeIdentifier.MakePascal(dependency?.Name);
 
-      if (dependency.IsOptions())
+      if (dependency.IsOptions() || dependency.IsLogger())
       {
         sb.Append($"        {dependencyName}!");
       }
       else if (!dependency!.Value.IsSealed &&
-          (dependency?.TypeKind == TypeKind.Interface || dependency?.TypeKind == TypeKind.Class))
+        (dependency?.TypeKind == TypeKind.Interface || dependency?.TypeKind == TypeKind.Class))
       {
         sb.Append($"        {dependencyName}.Object");
       }
@@ -555,6 +559,7 @@ public class SutAttribute<T>() : System.Attribute {}
     sb.AppendLine($"{dependencyMember.TypeArguments.Format(sut)}(");
 
     var hasReturnValue = !setupException && dependencyMember.ReturnType is not null;
+    var hasCallback = !setupException && dependencyMember.Parameters.Count > 0;
 
     for (var i = 0; i < dependencyMember.Parameters.Count; i++)
     {
@@ -568,8 +573,7 @@ public class SutAttribute<T>() : System.Attribute {}
       if (parameter.TypeKind == TypeKind.Array)
         parameterType += "[]";
       sb.Append($"      global::System.Linq.Expressions.Expression<global::System.Func<{parameterType}, global::System.Boolean>> {parameterName}");
-      if (i < dependencyMember.Parameters.Count - 1 || hasReturnValue || setupException) sb.Append(",");
-      sb.AppendLine();
+      sb.AppendLine(",");
     }
 
     if (hasReturnValue)
@@ -579,16 +583,43 @@ public class SutAttribute<T>() : System.Attribute {}
         dependencyType = $"global::{dependencyMember.ReturnTypeNamespace}.{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
       else
         dependencyType = $"{dependencyMember.ReturnType}{dependencyMember.ReturnTypeArguments.Format(sut)}";
-      sb.AppendLine($"      {dependencyType} returns");
+      sb.Append($"      {dependencyType} returns");
+      if (hasCallback)
+        sb.Append(",");
+      sb.AppendLine();
     }
     else if (setupException)
     {
       sb.AppendLine("      global::System.Exception exception");
     }
 
+    if (hasCallback)
+    {
+      sb.Append("      global::System.Action<");
+
+      for (var i = 0; i < dependencyMember.Parameters.Count; i++)
+      {
+        var parameter = dependencyMember.Parameters[i];
+        string parameterType;
+        if (parameter.TypeNamespace != sut.Namespace)
+          parameterType = $"global::{parameter.TypeNamespace}.{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
+        else
+          parameterType = $"{parameter.TypeName}{parameter.TypeArguments.Format(sut)}";
+        if (parameter.TypeKind == TypeKind.Array)
+          parameterType += "[]";
+        sb.Append(parameterType);
+        if (i < dependencyMember.Parameters.Count - 1) sb.Append(", ");
+      }
+
+      sb.AppendLine(">? callback = null");
+    }
+
     sb.AppendLine("    ) {");
 
-    sb.AppendLine($"      {dependencyName}");
+    sb.Append("      ");
+    if (!setupException)
+      sb.Append("var setup = ");
+    sb.AppendLine(dependencyName);
     sb.AppendLine($"        .Setup(x =>");
     sb.Append($"          x.{dependencyMember.Name}(");
 
@@ -625,7 +656,7 @@ public class SutAttribute<T>() : System.Attribute {}
       else
         sb.Append(".Returns(");
 
-      sb.AppendLine("returns)");
+      sb.AppendLine("returns);");
     }
 
     if (setupException)
@@ -641,8 +672,19 @@ public class SutAttribute<T>() : System.Attribute {}
     else
     {
       if (!hasReturnValue)
-        sb.AppendLine("        )");
-      sb.AppendLine("        .Verifiable();");
+        sb.AppendLine("        );");
+
+      if (hasCallback)
+      {
+        sb.AppendLine();
+        sb.AppendLine("      if (callback is not null)");
+        sb.AppendLine("        setup.Callback(callback);");
+        sb.AppendLine("      else");
+        sb.Append("  ");
+      }
+
+      sb.AppendLine("      setup.Verifiable();");
+      sb.AppendLine();
     }
 
     sb.AppendLine("      return this;");
@@ -677,21 +719,9 @@ public class SutAttribute<T>() : System.Attribute {}
     var dependencyName = CodeIdentifier.MakePascal(dependency.Name);
 
     sb.AppendLine($"    public {builderName} With_Logger(");
-    sb.AppendLine("      global::Microsoft.Extensions.Logging.LogLevel logLevel,");
-    sb.AppendLine("      string message,");
-    sb.AppendLine("      global::System.Exception? exception = null");
+    sb.AppendLine($"      global::Microsoft.Extensions.Logging.ILogger<{dependency.TypeArguments[0].TypeArgument}> logger");
     sb.AppendLine("    ) {");
-    sb.AppendLine($"      {dependencyName}");
-    sb.AppendLine("        .Setup(x =>");
-    sb.AppendLine("          x.Log(");
-    sb.AppendLine("            It.Is<global::Microsoft.Extensions.Logging.LogLevel>(l => l == logLevel),");
-    sb.AppendLine("            It.IsAny<global::Microsoft.Extensions.Logging.EventId>(),");
-    sb.AppendLine("            It.Is<It.IsAnyType>((v, t) => v.ToString() == message),");
-    sb.AppendLine("            It.Is<global::System.Exception?>(e => e == exception),");
-    sb.AppendLine("            It.IsAny<global::System.Func<It.IsAnyType, global::System.Exception?, string>>()");
-    sb.AppendLine("          )");
-    sb.AppendLine("        )");
-    sb.AppendLine("        .Verifiable();");
+    sb.AppendLine($"      {dependencyName} = logger;");
     sb.AppendLine("      return this;");
     sb.AppendLine("    }");
 

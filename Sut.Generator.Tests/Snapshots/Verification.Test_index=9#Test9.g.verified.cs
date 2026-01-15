@@ -16,17 +16,23 @@ public partial class Test9 {
     public Builder With_Dependency6_Evaluate(
       global::System.Linq.Expressions.Expression<global::System.Func<global::System.Func<Command, global::System.Boolean>, global::System.Boolean>> predicate,
       global::System.Linq.Expressions.Expression<global::System.Func<global::System.Threading.CancellationToken, global::System.Boolean>> cancellationToken,
-      global::System.Boolean returns
+      global::System.Boolean returns,
+      global::System.Action<global::System.Func<Command, global::System.Boolean>, global::System.Threading.CancellationToken>? callback = null
     ) {
-      Dependency6
+      var setup = Dependency6
         .Setup(x =>
           x.Evaluate(
             It.Is<global::System.Func<Command, global::System.Boolean>>(predicate),
             It.Is<global::System.Threading.CancellationToken>(cancellationToken)
           )
         )
-        .Returns(returns)
-        .Verifiable();
+        .Returns(returns);
+
+      if (callback is not null)
+        setup.Callback(callback);
+      else
+        setup.Verifiable();
+
       return this;
     }
 
