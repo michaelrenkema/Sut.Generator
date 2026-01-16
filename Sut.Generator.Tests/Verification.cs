@@ -169,6 +169,18 @@ namespace Test;
 [Sut<Example13>]
 public partial class Test13 {}
 """
+      },
+      {
+        14,
+        """
+using Sut;
+using Sut.Generator.Example;
+
+namespace Test;
+
+[Sut<Example14>]
+public partial class Test14 {}
+"""
       }
     };
   }
@@ -187,6 +199,7 @@ public partial class Test13 {}
   [Arguments(11)]
   [Arguments(12)]
   [Arguments(13)]
+  [Arguments(14)]
   public Task Test(int index)
   {
     var source = Tests[index];

@@ -11,7 +11,7 @@ public partial class Test2 {
   private Builder Sut { get; } = new();
 
   private class Builder {
-    public global::Microsoft.Extensions.Logging.ILogger<Example2> Logger { get; private set; }
+    public global::Microsoft.Extensions.Logging.ILogger<Example2>? Logger { get; private set; }
 
     public Builder With_Logger(
       global::Microsoft.Extensions.Logging.ILogger<Example2> logger

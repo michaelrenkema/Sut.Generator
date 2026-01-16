@@ -21,7 +21,6 @@ public partial class Test5 {
           x.Get()
         )
         .Returns(returns);
-
       setup.Verifiable();
 
       return this;
