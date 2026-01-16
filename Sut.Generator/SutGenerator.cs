@@ -163,7 +163,12 @@ public class SutAttribute<T>() : System.Attribute {}
             if (typeArgument.Kind == SymbolKind.TypeParameter)
               typeArguments.Add(new(typeParameter.Name, typeArgument.Name));
             else if (typeArgument.Kind == SymbolKind.NamedType)
-              typeArguments.Add(new(typeParameter.Name, typeArgument.Name, typeArgument.ContainingNamespace.ToString()));
+            {
+              var typeArgumentName = typeArgument.Name;
+              if (typeArgument.NullableAnnotation == NullableAnnotation.Annotated)
+                typeArgumentName += "?";
+              typeArguments.Add(new(typeParameter.Name, typeArgumentName, typeArgument.ContainingNamespace.ToString()));
+            }
           }
         }
 

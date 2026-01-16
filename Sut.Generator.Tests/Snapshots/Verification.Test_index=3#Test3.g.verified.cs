@@ -12,7 +12,7 @@ public partial class Test3 {
 
   private class Builder {
     public global::Microsoft.Extensions.Options.IOptions<TestOptions>? Options { get; private set; }
-    public global::Microsoft.Extensions.Logging.ILogger<Example3> Logger { get; private set; }
+    public global::Microsoft.Extensions.Logging.ILogger<Example3>? Logger { get; private set; }
     public Mock<IDependency1> Dependency1 { get; } = new();
     public Mock<IDependency3> Dependency3 { get; } = new();
     public Mock<Dependency4> Dependency4 { get; } = new();
