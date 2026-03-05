@@ -8,9 +8,9 @@ using Sut.Generator.Example;
 namespace Test;
 
 public partial class Test2 {
-  private Builder Sut { get; } = new();
+  public Builder Sut { get; } = new();
 
-  private class Builder {
+  public class Builder {
     public global::Microsoft.Extensions.Logging.ILogger<Example2>? Logger { get; private set; }
 
     public Builder With_Logger(

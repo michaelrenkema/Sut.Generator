@@ -8,9 +8,9 @@ using Sut.Generator.Example;
 namespace Test;
 
 public partial class Test1 {
-  private Builder Sut { get; } = new();
+  public Builder Sut { get; } = new();
 
-  private class Builder {
+  public class Builder {
     public global::Microsoft.Extensions.Options.IOptions<TestOptions>? Options { get; private set; }
 
     public Builder With_Options(
