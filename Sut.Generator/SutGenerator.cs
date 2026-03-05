@@ -440,9 +440,9 @@ public class SutAttribute<T>() : System.Attribute {}
 
     var builderName = $"Builder{sut?.TypeArguments.Format(sut.Value)}";
 
-    sb.AppendLine($"  private {builderName} Sut {{ get; }} = new();")
+    sb.AppendLine($"  public {builderName} Sut {{ get; }} = new();")
       .AppendLine("")
-      .AppendLine($"  private class {builderName} {{");
+      .AppendLine($"  public class {builderName} {{");
 
     if (sut?.Dependencies.Count > 0)
     {

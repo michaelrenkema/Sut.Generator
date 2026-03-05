@@ -8,9 +8,9 @@ using Sut.Generator.Example;
 namespace Test;
 
 public partial class Test5 {
-  private Builder<Command> Sut { get; } = new();
+  public Builder<Command> Sut { get; } = new();
 
-  private class Builder<Command> {
+  public class Builder<Command> {
     public Mock<IDependency2<Command>> Dependency2 { get; } = new();
 
     public Builder<Command> With_Dependency2_Get(
